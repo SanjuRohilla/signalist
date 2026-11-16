@@ -38,12 +38,8 @@ export const connectToDatabase = async () => {
 
     try {
         cached.conn = await cached.promise;
-
-        console.log(
-            `Connected to database: ${process.env.NODE_ENV}`
-        );
-
     } catch (err) {
+        console.error("MongoDB connection failed:", err);
         cached.promise = null;
         throw err;
     }
