@@ -1,7 +1,8 @@
 
+
 'use client';
 
-import { useForm } from "react-hook-form";
+import { useForm, type Control } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import InputField from "@/components/forms/InputField";
 import SelectField from "@/components/forms/SelectField";
@@ -23,16 +24,22 @@ const SignUp = () => {
         formState: { errors, isSubmitting },
     } = useForm<SignUpFormData>({
         defaultValues: {
-            fullName: '',
-            email: '',
-            password: '',
-            country: 'US',
-            investmentGoals: 'Growth',
-            riskTolerance: 'Medium',
-            preferredIndustry: 'Technology',
+            fullName: "",
+            email: "",
+            password: "",
+            country: "US",
+            investmentGoals: "Growth",
+            riskTolerance: "Medium",
+            preferredIndustry: "Technology",
         },
-        mode: 'onBlur',
+        mode: "onBlur",
     });
+
+    // Bridge between the form's specific type and the reusable
+    // select components' current Control<Record<string, string>> prop.
+    const selectControl = control as unknown as Control<
+        Record<string, string>
+    >;
 
     const onSubmit = async (data: SignUpFormData) => {
         try {
@@ -40,19 +47,17 @@ const SignUp = () => {
 
             if (result.success) {
                 toast.success("Account created successfully!");
-
-                // Force a fresh request so the new session cookie is read.
                 window.location.assign("/");
             } else {
                 toast.error(result.error || "Sign up failed");
             }
-        } catch (e) {
-            console.error("Sign up failed:", e);
+        } catch (error) {
+            console.error("Sign up failed:", error);
 
             toast.error("Sign up failed", {
                 description:
-                    e instanceof Error
-                        ? e.message
+                    error instanceof Error
+                        ? error.message
                         : "Failed to create an account.",
             });
         }
@@ -73,7 +78,7 @@ const SignUp = () => {
                     register={register}
                     error={errors.fullName}
                     validation={{
-                        required: 'Full name is required',
+                        required: "Full name is required",
                         minLength: 2,
                     }}
                 />
@@ -85,7 +90,7 @@ const SignUp = () => {
                     register={register}
                     error={errors.email}
                     validation={{
-                        required: 'Email is required',
+                        required: "Email is required",
                         pattern: /^\w+@\w+\.\w+$/,
                     }}
                 />
@@ -98,7 +103,7 @@ const SignUp = () => {
                     register={register}
                     error={errors.password}
                     validation={{
-                        required: 'Password is required',
+                        required: "Password is required",
                         minLength: 8,
                     }}
                 />
@@ -106,7 +111,7 @@ const SignUp = () => {
                 <CountrySelectField
                     name="country"
                     label="Country"
-                    control={control}
+                    control={selectControl}
                     error={errors.country}
                     required
                 />
@@ -116,7 +121,7 @@ const SignUp = () => {
                     label="Investment Goals"
                     placeholder="Select your investment goal"
                     options={INVESTMENT_GOALS}
-                    control={control}
+                    control={selectControl}
                     error={errors.investmentGoals}
                     required
                 />
@@ -126,7 +131,7 @@ const SignUp = () => {
                     label="Risk Tolerance"
                     placeholder="Select your risk level"
                     options={RISK_TOLERANCE_OPTIONS}
-                    control={control}
+                    control={selectControl}
                     error={errors.riskTolerance}
                     required
                 />
@@ -136,7 +141,7 @@ const SignUp = () => {
                     label="Preferred Industry"
                     placeholder="Select your preferred industry"
                     options={PREFERRED_INDUSTRIES}
-                    control={control}
+                    control={selectControl}
                     error={errors.preferredIndustry}
                     required
                 />
@@ -147,8 +152,8 @@ const SignUp = () => {
                     className="yellow-btn w-full mt-5"
                 >
                     {isSubmitting
-                        ? 'Creating Account'
-                        : 'Start Your Investing Journey'}
+                        ? "Creating Account"
+                        : "Start Your Investing Journey"}
                 </Button>
 
                 <FooterLink

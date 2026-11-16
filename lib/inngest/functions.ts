@@ -1,4 +1,5 @@
 
+
 import { inngest } from "@/lib/inngest/client";
 
 import {
@@ -15,6 +16,20 @@ import { getAllUsersForNewsEmail } from "@/lib/actions/user.actions";
 import { getWatchlistSymbolsByEmail } from "@/lib/actions/watchlist.actions";
 import { getNews } from "@/lib/actions/finnhub.actions";
 import { getFormattedTodayDate } from "@/lib/utils";
+
+// Types
+type UserForNewsEmail = {
+    id: string;
+    email: string;
+    name?: string | null;
+};
+
+type MarketNewsArticle = Awaited<ReturnType<typeof getNews>>[number];
+
+type UserNewsResult = {
+    user: UserForNewsEmail;
+    articles: MarketNewsArticle[];
+};
 
 // ==========================================
 // FUNCTION 1: SEND SIGN-UP WELCOME EMAIL
@@ -90,11 +105,11 @@ export const sendDailyNewsSummary = inngest.createFunction(
     },
 
     async ({ step }) => {
-        // Step 1: Get all users for news delivery
-        const users = await step.run(
+        // Step 1: Get all users
+        const users = (await step.run(
             "get-all-users",
             getAllUsersForNewsEmail
-        );
+        )) as UserForNewsEmail[];
 
         if (!users || users.length === 0) {
             return {
@@ -104,26 +119,20 @@ export const sendDailyNewsSummary = inngest.createFunction(
         }
 
         // Step 2: Fetch watchlist symbols and news for each user
-        const results = await step.run(
+        const results = (await step.run(
             "fetch-user-news",
             async () => {
-                const perUser: Array<{
-                    user: UserForNewsEmail;
-                    articles: MarketNewsArticle[];
-                }> = [];
+                const perUser: UserNewsResult[] = [];
 
-                for (const user of users as UserForNewsEmail[]) {
+                for (const user of users) {
                     try {
-                        const symbols = await getWatchlistSymbolsByEmail(
-                            user.email
-                        );
+                        const symbols = await getWatchlistSymbolsByEmail(user.email);
 
                         let articles = await getNews(symbols);
 
-                        // Maximum 6 articles per user
                         articles = (articles || []).slice(0, 6);
 
-                        // Fallback to general news if watchlist news is empty
+                        // Fallback to general news
                         if (!articles || articles.length === 0) {
                             articles = await getNews();
                             articles = (articles || []).slice(0, 6);
@@ -149,7 +158,7 @@ export const sendDailyNewsSummary = inngest.createFunction(
 
                 return perUser;
             }
-        );
+        )) as UserNewsResult[];
 
         // Step 3: Generate AI news summaries
         const userNewsSummaries: {
@@ -208,17 +217,15 @@ export const sendDailyNewsSummary = inngest.createFunction(
         // Step 4: Send news summary emails
         await step.run("send-news-emails", async () => {
             await Promise.all(
-                userNewsSummaries.map(
-                    async ({ user, newsContent }) => {
-                        if (!newsContent) return false;
+                userNewsSummaries.map(async ({ user, newsContent }) => {
+                    if (!newsContent) return false;
 
-                        return await sendNewsSummaryEmail({
-                            email: user.email,
-                            date: getFormattedTodayDate(),
-                            newsContent,
-                        });
-                    }
-                )
+                    return await sendNewsSummaryEmail({
+                        email: user.email,
+                        date: getFormattedTodayDate(),
+                        newsContent,
+                    });
+                })
             );
         });
 

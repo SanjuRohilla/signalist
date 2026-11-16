@@ -1,4 +1,5 @@
 
+
 import { Suspense } from "react";
 import { connection } from "next/server";
 import { headers } from "next/headers";
@@ -9,6 +10,15 @@ import { getAuth } from "@/lib/better-auth/auth";
 import { connectToDatabase } from "@/database/mongoose";
 import { Watchlist } from "@/database/models/watchlist.model";
 import { removeWatchlistStock } from "@/lib/actions/watchlist.actions";
+
+// Form action wrapper
+async function handleRemoveWatchlistStock(
+    formData: FormData
+): Promise<void> {
+    "use server";
+
+    await removeWatchlistStock(formData);
+}
 
 async function WatchlistContent() {
     await connection();
@@ -39,9 +49,11 @@ async function WatchlistContent() {
                     <p className="mb-2 text-sm font-medium text-green-400">
                         YOUR PERSONAL PORTFOLIO
                     </p>
+
                     <h1 className="text-3xl font-bold md:text-4xl">
                         My Watchlist
                     </h1>
+
                     <p className="mt-3 text-gray-400">
                         Keep track of the stocks that matter to you.
                     </p>
@@ -51,14 +63,19 @@ async function WatchlistContent() {
                     <p className="text-sm text-gray-400">
                         Total Stocks Tracking
                     </p>
+
                     <p className="mt-2 text-3xl font-bold">
                         {stocks.length}
                     </p>
                 </div>
 
                 <div className="overflow-hidden rounded-xl border border-white/10 bg-[#111]">
+
                     <div className="flex items-center justify-between border-b border-white/10 p-5">
-                        <h2 className="text-lg font-semibold">Your Stocks</h2>
+                        <h2 className="text-lg font-semibold">
+                            Your Stocks
+                        </h2>
+
                         <span className="rounded-full bg-green-500/10 px-3 py-1 text-xs text-green-400">
               {stocks.length} Assets
             </span>
@@ -67,12 +84,15 @@ async function WatchlistContent() {
                     {stocks.length === 0 ? (
                         <div className="px-5 py-20 text-center">
                             <div className="mb-4 text-5xl">☆</div>
+
                             <h3 className="text-xl font-semibold">
                                 Your watchlist is empty
                             </h3>
+
                             <p className="mt-2 text-sm text-gray-400">
                                 Search for stocks and add them to your watchlist.
                             </p>
+
                             <Link
                                 href="/search"
                                 className="mt-6 inline-block rounded-lg bg-green-500 px-5 py-3 font-medium text-black hover:bg-green-400"
@@ -101,6 +121,7 @@ async function WatchlistContent() {
                                         <td className="px-6 py-5 font-medium">
                                             {stock.company}
                                         </td>
+
                                         <td className="px-6 py-5">
                                             <Link
                                                 href={`/stocks/${encodeURIComponent(stock.symbol)}`}
@@ -109,6 +130,7 @@ async function WatchlistContent() {
                                                 {stock.symbol}
                                             </Link>
                                         </td>
+
                                         <td className="px-6 py-5 text-sm text-gray-400">
                                             {new Date(stock.addedAt).toLocaleDateString(
                                                 "en-IN",
@@ -119,13 +141,15 @@ async function WatchlistContent() {
                                                 }
                                             )}
                                         </td>
+
                                         <td className="px-6 py-5 text-right">
-                                            <form action={removeWatchlistStock}>
+                                            <form action={handleRemoveWatchlistStock}>
                                                 <input
                                                     type="hidden"
                                                     name="symbol"
                                                     value={stock.symbol}
                                                 />
+
                                                 <button
                                                     type="submit"
                                                     className="rounded-lg border border-red-500/20 px-4 py-2 text-sm text-red-400 hover:bg-red-500/10"
@@ -159,5 +183,3 @@ export default function WatchlistPage() {
         </Suspense>
     );
 }
-
-
