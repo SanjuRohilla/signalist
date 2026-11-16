@@ -1,27 +1,23 @@
 
 
+
 import Link from "next/link";
 import Image from "next/image";
 import { getAuth } from "@/lib/better-auth/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { connection } from "next/server";
-import { Suspense } from "react";
 import type { ReactNode } from "react";
 
-const AuthLayoutContent = async ({
-                                     children,
-                                 }: {
-    children: ReactNode;
-}) => {
-    await connection();
+export const instant = false;
 
+const Layout = async ({ children }: { children: ReactNode }) => {
     const auth = await getAuth();
 
     const session = await auth.api.getSession({
         headers: await headers(),
     });
 
+    // Already authenticated users should go to the homepage.
     if (session?.user) {
         redirect("/");
     }
@@ -38,6 +34,7 @@ const AuthLayoutContent = async ({
                         className="h-8 w-auto"
                         priority
                     />
+
                 </Link>
 
                 <div className="pb-6 lg:pb-8 flex-1">
@@ -93,15 +90,4 @@ const AuthLayoutContent = async ({
     );
 };
 
-const Layout = ({ children }: { children: ReactNode }) => {
-    return (
-        <Suspense fallback={<div>Loading...</div>}>
-            <AuthLayoutContent>
-                {children}
-            </AuthLayoutContent>
-        </Suspense>
-    );
-};
-
 export default Layout;
-

@@ -1,9 +1,17 @@
-"use client";
-import React, { useMemo, useState } from "react";
 
-// Minimal WatchlistButton implementation to satisfy page requirements.
-// This component focuses on UI contract only. It toggles local state and
-// calls onWatchlistChange if provided. Styling hooks match globals.css.
+"use client";
+
+import React, { useState } from "react";
+import { toggleWatchlist } from "@/lib/actions/watchlist.actions";
+
+interface WatchlistButtonProps {
+    symbol: string;
+    company: string;
+    isInWatchlist: boolean;
+    showTrashIcon?: boolean;
+    type?: "button" | "icon";
+    onWatchlistChange?: (symbol: string, added: boolean) => void;
+}
 
 const WatchlistButton = ({
                              symbol,
@@ -13,26 +21,49 @@ const WatchlistButton = ({
                              type = "button",
                              onWatchlistChange,
                          }: WatchlistButtonProps) => {
-    const [added, setAdded] = useState<boolean>(!!isInWatchlist);
+    const [added, setAdded] = useState(isInWatchlist);
+    const [loading, setLoading] = useState(false);
 
-    const label = useMemo(() => {
-        if (type === "icon") return added ? "" : "";
-        return added ? "Remove from Watchlist" : "Add to Watchlist";
-    }, [added, type]);
+    const handleClick = async () => {
+        if (loading) return;
 
-    const handleClick = () => {
-        const next = !added;
-        setAdded(next);
-        onWatchlistChange?.(symbol, next);
+        setLoading(true);
+
+        try {
+            const next = !added;
+
+            const result = await toggleWatchlist(
+                symbol,
+                company,
+                next
+            );
+
+            if (!result.success) {
+                alert(result.error || "Unable to update watchlist");
+                return;
+            }
+
+            setAdded(next);
+            onWatchlistChange?.(symbol, next);
+        } catch (error) {
+            console.error("Watchlist button error:", error);
+            alert("Something went wrong. Please try again.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (type === "icon") {
         return (
             <button
-                title={added ? `Remove ${symbol} from watchlist` : `Add ${symbol} to watchlist`}
-                aria-label={added ? `Remove ${symbol} from watchlist` : `Add ${symbol} to watchlist`}
-                className={`watchlist-icon-btn ${added ? "watchlist-icon-added" : ""}`}
+                type="button"
                 onClick={handleClick}
+                disabled={loading}
+                title={added ? "Remove from watchlist" : "Add to watchlist"}
+                aria-label={added ? "Remove from watchlist" : "Add to watchlist"}
+                className={`watchlist-icon-btn ${
+                    added ? "watchlist-icon-added" : ""
+                }`}
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -53,20 +84,19 @@ const WatchlistButton = ({
     }
 
     return (
-        <button className={`watchlist-btn ${added ? "watchlist-remove" : ""}`} onClick={handleClick}>
-            {showTrashIcon && added ? (
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-5 h-5 mr-2"
-                >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 7h12M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2m-7 4v6m4-6v6m4-6v6" />
-                </svg>
-            ) : null}
-            <span>{label}</span>
+        <button
+            type="button"
+            onClick={handleClick}
+            disabled={loading}
+            className={`watchlist-btn ${
+                added ? "watchlist-remove" : ""
+            }`}
+        >
+            {loading
+                ? "Please wait..."
+                : added
+                    ? "Remove from Watchlist"
+                    : "Add to Watchlist"}
         </button>
     );
 };
