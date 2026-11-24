@@ -8,7 +8,7 @@ A modern stock market intelligence platform designed to help users explore finan
 
 ## 🎥 Project Demo
 
-https://github.com/SanjuRohilla/signalist/blob/main/public/signalist.mp4
+![Signalist Demo](./public/signalist.gif)
 
 ## ✨ Features
 
