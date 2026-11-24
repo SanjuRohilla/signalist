@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
 
-First, run the development server:
+# 📈 Signalist — Stock Market Intelligence Platform
+
+A modern stock market intelligence platform designed to help users explore financial markets, track stocks, and analyze market trends through an interactive and intuitive interface.
+
+🌐 **Live Demo:** [View Signalist](https://signalist20-rdjuog6jq-sanjus-projects-951a3a1e.vercel.app/)
+
+## 🎥 Project Demo
+
+https://github.com/SanjuRohilla/signalist/blob/main/public/signalist.mp4
+
+## ✨ Features
+
+- 📊 Interactive stock market dashboard
+- 📈 Stock price tracking and market insights
+- 🔍 Stock search and exploration
+- 📉 Financial data visualization
+- 🎨 Modern and responsive user interface
+- ⚡ Optimized performance and smooth navigation
+
+## 🛠️ Tech Stack
+
+- **Framework:** Next.js
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **Deployment:** Vercel
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js
+- npm
+
+### Installation
 
 ```bash
+git clone https://github.com/SanjuRohilla/signalist.git
+
+cd signalist
+
+npm install
+
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000 in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🌐 Live Deployment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+[Signalist — Live Application](https://signalist20-rdjuog6jq-sanjus-projects-951a3a1e.vercel.app/)
 
-## Learn More
+## 👩‍💻 Author
 
-To learn more about Next.js, take a look at the following resources:
+**Sanju Rohilla**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- GitHub: [@SanjuRohilla](https://github.com/SanjuRohilla)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+⭐ If you like this project, consider giving it a star!
